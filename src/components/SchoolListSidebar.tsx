@@ -5,6 +5,7 @@ import { schools, School } from "@/data/schools";
 interface SchoolListSidebarProps {
   activeMetric: "faktisktVarde1" | "faktisktVarde2";
   onSchoolClick?: (school: School) => void;
+  selectedSchool?: string | null;
 }
 
 const metricLabels = {
@@ -24,7 +25,7 @@ function getColor(value: number, metric: "faktisktVarde1" | "faktisktVarde2"): s
   return "hsl(0, 70%, 50%)";
 }
 
-export default function SchoolListSidebar({ activeMetric, onSchoolClick }: SchoolListSidebarProps) {
+export default function SchoolListSidebar({ activeMetric, onSchoolClick, selectedSchool }: SchoolListSidebarProps) {
   const [isOpen, setIsOpen] = useState(true);
   const [expandedSchool, setExpandedSchool] = useState<string | null>(null);
 
@@ -65,10 +66,13 @@ export default function SchoolListSidebar({ activeMetric, onSchoolClick }: Schoo
               const isExpanded = expandedSchool === school.name;
 
               return (
-                <div key={school.name} className="border-b border-border/50">
+                <div key={school.name} className={`border-b border-border/50 ${selectedSchool === school.name ? "bg-primary/10" : ""}`}>
                   <button
-                    onClick={() => setExpandedSchool(isExpanded ? null : school.name)}
-                    className="w-full text-left px-3 py-2 hover:bg-muted/50 transition-colors flex items-center gap-2"
+                    onClick={() => {
+                      setExpandedSchool(isExpanded ? null : school.name);
+                      onSchoolClick?.(school);
+                    }}
+                    className={`w-full text-left px-3 py-2 hover:bg-muted/50 transition-colors flex items-center gap-2 ${selectedSchool === school.name ? "bg-primary/10" : ""}`}
                   >
                     <span
                       className="w-2.5 h-2.5 rounded-full shrink-0"
@@ -119,18 +123,9 @@ export default function SchoolListSidebar({ activeMetric, onSchoolClick }: Schoo
                         <div>Nyinvandrade: {school.percentNewImmigrants}%</div>
                         <div>Pojkar: {school.percentBoys}%</div>
                       </div>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onSchoolClick?.(school);
-                        }}
-                        className="flex items-center gap-1 text-[10px] font-medium text-primary hover:underline"
-                      >
-                        <MapPin className="h-3 w-3" />
-                        Visa på kartan
-                      </button>
                     </div>
                   )}
+
                 </div>
               );
             })}
