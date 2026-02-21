@@ -34,12 +34,18 @@ function getRadius(value: number, metric: MetricKey): number {
 }
 
 function PopupContent({ school }: { school: School }) {
+  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(school.name + " " + school.kommun)}`;
   return (
     <div className="p-3 space-y-2">
       <h3 className="font-bold text-sm text-foreground leading-tight">{school.name}</h3>
-      <span className="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
-        {school.principal === "Kom." ? "Kommunal" : "Enskild"}
-      </span>
+      <div className="flex items-center gap-1.5 flex-wrap">
+        <span className="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+          {school.principal === "Kom." ? "Kommunal" : "Enskild"}
+        </span>
+        <span className="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+          {school.kommun}
+        </span>
+      </div>
       <div className="grid grid-cols-2 gap-2 pt-1">
         <div className="bg-muted/60 rounded-md p-2 text-center">
           <div className="text-lg font-bold text-foreground">{school.faktisktVarde1 ?? "–"}%</div>
@@ -55,6 +61,14 @@ function PopupContent({ school }: { school: School }) {
         <div>Nyinvandrade: {school.percentNewImmigrants}%</div>
         <div>Pojkar: {school.percentBoys}%</div>
       </div>
+      <a
+        href={googleMapsUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-1 text-[10px] text-primary hover:underline pt-1"
+      >
+        📍 Visa på Google Maps
+      </a>
     </div>
   );
 }
@@ -130,7 +144,7 @@ export default function SchoolMap() {
       />
 
       <MapContainer
-        center={[55.59, 13.05]}
+        center={[55.58, 13.05]}
         zoom={11}
         className="h-full w-full"
         zoomControl={false}
