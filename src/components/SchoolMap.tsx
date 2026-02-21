@@ -84,7 +84,7 @@ export default function SchoolMap() {
     <div className="h-screen w-screen relative">
       {/* Controls */}
       <div className="absolute top-4 left-4 z-[1000] bg-card/95 backdrop-blur-sm rounded-lg shadow-lg border border-border p-3 space-y-2">
-        <h1 className="text-sm font-bold text-foreground">Skolor i Malmö 2025</h1>
+        <h1 className="text-sm font-bold text-foreground">Skolor i Malmö-regionen 2025</h1>
         <p className="text-[10px] text-muted-foreground">SALSA – Skolverket</p>
         <div className="flex gap-1">
           {(Object.keys(metricLabels) as MetricKey[]).map((key) => (
@@ -130,8 +130,8 @@ export default function SchoolMap() {
       />
 
       <MapContainer
-        center={[55.585, 13.005]}
-        zoom={12}
+        center={[55.59, 13.05]}
+        zoom={11}
         className="h-full w-full"
         zoomControl={false}
       >
