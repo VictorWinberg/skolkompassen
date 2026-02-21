@@ -1,6 +1,8 @@
-import { MapContainer, TileLayer, CircleMarker, Popup, ZoomControl } from "react-leaflet";
+import { MapContainer, TileLayer, CircleMarker, Popup, ZoomControl, useMap } from "react-leaflet";
 import { schools, School } from "@/data/schools";
-import { useState } from "react";
+import { useState, useCallback, useRef } from "react";
+import SchoolListSidebar from "./SchoolListSidebar";
+import L from "leaflet";
 
 type MetricKey = "faktisktVarde1" | "faktisktVarde2";
 
@@ -16,7 +18,6 @@ function getColor(value: number, metric: MetricKey): string {
   };
   const [min, max] = ranges[metric];
   const ratio = Math.max(0, Math.min(1, (value - min) / (max - min)));
-
   if (ratio > 0.66) return "hsl(160, 60%, 40%)";
   if (ratio > 0.33) return "hsl(45, 80%, 50%)";
   return "hsl(0, 70%, 50%)";
@@ -58,8 +59,23 @@ function PopupContent({ school }: { school: School }) {
   );
 }
 
+function FlyToSchool({ school }: { school: School | null }) {
+  const map = useMap();
+  if (school) {
+    map.flyTo([school.lat, school.lng], 15, { duration: 0.8 });
+  }
+  return null;
+}
+
 export default function SchoolMap() {
   const [activeMetric, setActiveMetric] = useState<MetricKey>("faktisktVarde1");
+  const [flyTarget, setFlyTarget] = useState<School | null>(null);
+
+  const handleSchoolClick = useCallback((school: School) => {
+    setFlyTarget(school);
+    // Reset after flying
+    setTimeout(() => setFlyTarget(null), 1000);
+  }, []);
 
   return (
     <div className="h-screen w-screen relative">
@@ -103,6 +119,9 @@ export default function SchoolMap() {
         </div>
       </div>
 
+      {/* School list sidebar */}
+      <SchoolListSidebar activeMetric={activeMetric} onSchoolClick={handleSchoolClick} />
+
       <MapContainer
         center={[55.585, 13.005]}
         zoom={12}
@@ -110,6 +129,7 @@ export default function SchoolMap() {
         zoomControl={false}
       >
         <ZoomControl position="topright" />
+        <FlyToSchool school={flyTarget} />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
