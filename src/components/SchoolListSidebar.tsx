@@ -84,6 +84,7 @@ export default function SchoolListSidebar({ activeMetric, onSchoolClick, selecte
                       <div className="flex items-center justify-between gap-1">
                         <span className="text-xs font-medium text-foreground truncate">
                           {index + 1}. {school.name}
+                          <span className="text-[9px] text-muted-foreground ml-1">({school.kommun})</span>
                         </span>
                         <span className="text-xs font-bold text-foreground shrink-0">
                           {value !== null
@@ -118,6 +119,7 @@ export default function SchoolListSidebar({ activeMetric, onSchoolClick, selecte
                         </div>
                       </div>
                       <div className="text-[10px] text-muted-foreground space-y-0.5">
+                        <div>Kommun: {school.kommun}</div>
                         <div>Huvudman: {school.principal === "Kom." ? "Kommunal" : "Enskild"}</div>
                         <div>Föräldrarnas utb.nivå: {school.parentEducation}</div>
                         <div>Nyinvandrade: {school.percentNewImmigrants}%</div>
