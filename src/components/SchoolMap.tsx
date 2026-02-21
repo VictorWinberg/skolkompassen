@@ -1,6 +1,6 @@
 import { MapContainer, TileLayer, CircleMarker, Popup, ZoomControl, useMap } from "react-leaflet";
 import { schools, School } from "@/data/schools";
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import SchoolListSidebar from "./SchoolListSidebar";
 import L from "leaflet";
 
@@ -61,19 +61,22 @@ function PopupContent({ school }: { school: School }) {
 
 function FlyToSchool({ school }: { school: School | null }) {
   const map = useMap();
-  if (school) {
-    map.flyTo([school.lat, school.lng], 15, { duration: 0.8 });
-  }
+  useEffect(() => {
+    if (school) {
+      map.flyTo([school.lat, school.lng], 15, { duration: 0.8 });
+    }
+  }, [school, map]);
   return null;
 }
 
 export default function SchoolMap() {
   const [activeMetric, setActiveMetric] = useState<MetricKey>("faktisktVarde1");
   const [flyTarget, setFlyTarget] = useState<School | null>(null);
+  const [selectedSchool, setSelectedSchool] = useState<string | null>(null);
 
   const handleSchoolClick = useCallback((school: School) => {
+    setSelectedSchool(school.name);
     setFlyTarget(school);
-    // Reset after flying
     setTimeout(() => setFlyTarget(null), 1000);
   }, []);
 
@@ -120,7 +123,11 @@ export default function SchoolMap() {
       </div>
 
       {/* School list sidebar */}
-      <SchoolListSidebar activeMetric={activeMetric} onSchoolClick={handleSchoolClick} />
+      <SchoolListSidebar
+        activeMetric={activeMetric}
+        onSchoolClick={handleSchoolClick}
+        selectedSchool={selectedSchool}
+      />
 
       <MapContainer
         center={[55.585, 13.005]}
@@ -137,17 +144,21 @@ export default function SchoolMap() {
         {schools.map((school) => {
           const value = school[activeMetric];
           if (value === null) return null;
+          const isSelected = selectedSchool === school.name;
           return (
             <CircleMarker
               key={school.name}
               center={[school.lat, school.lng]}
-              radius={getRadius(value, activeMetric)}
+              radius={isSelected ? getRadius(value, activeMetric) + 4 : getRadius(value, activeMetric)}
               pathOptions={{
-                color: getColor(value, activeMetric),
+                color: isSelected ? "hsl(220, 90%, 50%)" : getColor(value, activeMetric),
                 fillColor: getColor(value, activeMetric),
-                fillOpacity: 0.7,
-                weight: 2,
+                fillOpacity: isSelected ? 0.9 : 0.7,
+                weight: isSelected ? 4 : 2,
                 opacity: 0.9,
+              }}
+              eventHandlers={{
+                click: () => setSelectedSchool(school.name),
               }}
             >
               <Popup className="school-popup">
