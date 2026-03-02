@@ -6,6 +6,7 @@ interface SchoolListSidebarProps {
   activeMetric: "faktisktVarde1" | "faktisktVarde2";
   onSchoolClick?: (school: School) => void;
   selectedSchool?: string | null;
+  year?: number;
 }
 
 const metricLabels = {
@@ -25,11 +26,18 @@ function getColor(value: number, metric: "faktisktVarde1" | "faktisktVarde2"): s
   return "hsl(0, 70%, 50%)";
 }
 
-export default function SchoolListSidebar({ activeMetric, onSchoolClick, selectedSchool }: SchoolListSidebarProps) {
+export default function SchoolListSidebar({
+  activeMetric,
+  onSchoolClick,
+  selectedSchool,
+  year,
+}: SchoolListSidebarProps) {
   const [isOpen, setIsOpen] = useState(true);
   const [expandedSchool, setExpandedSchool] = useState<string | null>(null);
 
-  const sortedSchools = [...schools].sort((a, b) => {
+  const filtered = typeof year === "number" ? schools.filter((s) => s.år === year) : schools;
+
+  const sortedSchools = [...filtered].sort((a, b) => {
     const aVal = a[activeMetric] ?? 0;
     const bVal = b[activeMetric] ?? 0;
     return bVal - aVal;
@@ -48,13 +56,17 @@ export default function SchoolListSidebar({ activeMetric, onSchoolClick, selecte
           className="self-center -ml-1 bg-card/95 backdrop-blur-sm border border-r-0 border-border rounded-l-lg px-1 py-4 hover:bg-muted transition-colors"
           aria-label={isOpen ? "Minimera listan" : "Visa listan"}
         >
-          {isOpen ? <ChevronRight className="h-4 w-4 text-foreground" /> : <ChevronLeft className="h-4 w-4 text-foreground" />}
+          {isOpen ? (
+            <ChevronRight className="h-4 w-4 text-foreground" />
+          ) : (
+            <ChevronLeft className="h-4 w-4 text-foreground" />
+          )}
         </button>
 
         {/* Sidebar content */}
         <div className="w-80 h-full bg-card/95 backdrop-blur-sm border-l border-border shadow-lg overflow-hidden flex flex-col">
           <div className="p-3 border-b border-border">
-            <h2 className="text-sm font-bold text-foreground">Alla skolor ({schools.length})</h2>
+            <h2 className="text-sm font-bold text-foreground">Alla skolor ({filtered.length})</h2>
             <p className="text-[10px] text-muted-foreground">
               Sorterade efter {metricLabels[activeMetric]}
             </p>
@@ -66,7 +78,10 @@ export default function SchoolListSidebar({ activeMetric, onSchoolClick, selecte
               const isExpanded = expandedSchool === school.name;
 
               return (
-                <div key={school.name} className={`border-b border-border/50 ${selectedSchool === school.name ? "bg-primary/10" : ""}`}>
+                <div
+                  key={school.name}
+                  className={`border-b border-border/50 ${selectedSchool === school.name ? "bg-primary/10" : ""}`}
+                >
                   <button
                     onClick={() => {
                       setExpandedSchool(isExpanded ? null : school.name);
@@ -77,14 +92,17 @@ export default function SchoolListSidebar({ activeMetric, onSchoolClick, selecte
                     <span
                       className="w-2.5 h-2.5 rounded-full shrink-0"
                       style={{
-                        background: value !== null ? getColor(value, activeMetric) : "hsl(var(--muted))",
+                        background:
+                          value !== null ? getColor(value, activeMetric) : "hsl(var(--muted))",
                       }}
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-1">
                         <span className="text-xs font-medium text-foreground truncate">
                           {index + 1}. {school.name}
-                          <span className="text-[9px] text-muted-foreground ml-1">({school.kommun})</span>
+                          <span className="text-[9px] text-muted-foreground ml-1">
+                            ({school.kommun})
+                          </span>
                         </span>
                         <span className="text-xs font-bold text-foreground shrink-0">
                           {value !== null
@@ -127,7 +145,6 @@ export default function SchoolListSidebar({ activeMetric, onSchoolClick, selecte
                       </div>
                     </div>
                   )}
-
                 </div>
               );
             })}

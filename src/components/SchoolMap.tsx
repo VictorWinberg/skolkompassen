@@ -87,6 +87,7 @@ export default function SchoolMap() {
   const [activeMetric, setActiveMetric] = useState<MetricKey>("faktisktVarde1");
   const [flyTarget, setFlyTarget] = useState<School | null>(null);
   const [selectedSchool, setSelectedSchool] = useState<string | null>(null);
+  const [year, setYear] = useState<number>(2025);
 
   const handleSchoolClick = useCallback((school: School) => {
     setSelectedSchool(school.name);
@@ -94,11 +95,19 @@ export default function SchoolMap() {
     setTimeout(() => setFlyTarget(null), 1000);
   }, []);
 
+  // clear selection when we change year
+  useEffect(() => {
+    setSelectedSchool(null);
+    setFlyTarget(null);
+  }, [year]);
+
+  const filteredSchools = schools.filter((s) => s.år === year);
+
   return (
     <div className="h-screen w-screen relative">
       {/* Controls */}
       <div className="absolute top-4 left-4 z-[1000] bg-card/95 backdrop-blur-sm rounded-lg shadow-lg border border-border p-3 space-y-2">
-        <h1 className="text-sm font-bold text-foreground">Skolor i Malmö-regionen 2025</h1>
+        <h1 className="text-sm font-bold text-foreground">Skolor i Malmö-regionen {year}</h1>
         <p className="text-[10px] text-muted-foreground">SALSA – Skolverket</p>
         <div className="flex gap-1">
           {(Object.keys(metricLabels) as MetricKey[]).map((key) => (
@@ -115,22 +124,49 @@ export default function SchoolMap() {
             </button>
           ))}
         </div>
+        <div className="pt-2 flex items-center gap-3">
+          <label className="text-[10px] text-muted-foreground mr-2">År</label>
+          <div className="flex items-center gap-2">
+            <input
+              aria-label="Välj år"
+              type="range"
+              min={2010}
+              max={2025}
+              step={5}
+              value={year}
+              onChange={(e) => setYear(Number(e.target.value))}
+              className="h-2 w-40 accent-primary"
+            />
+            <div className="text-[11px] font-medium">{year}</div>
+          </div>
+        </div>
       </div>
 
       {/* Legend */}
       <div className="absolute bottom-6 left-4 z-[1000] bg-card/95 backdrop-blur-sm rounded-lg shadow-lg border border-border p-3">
-        <div className="text-[10px] font-semibold text-foreground mb-1.5">{metricLabels[activeMetric]}</div>
+        <div className="text-[10px] font-semibold text-foreground mb-1.5">
+          {metricLabels[activeMetric]}
+        </div>
         <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
           <span className="flex items-center gap-1">
-            <span className="inline-block w-3 h-3 rounded-full" style={{ background: "hsl(0, 70%, 50%)" }} />
+            <span
+              className="inline-block w-3 h-3 rounded-full"
+              style={{ background: "hsl(0, 70%, 50%)" }}
+            />
             Låg
           </span>
           <span className="flex items-center gap-1">
-            <span className="inline-block w-3 h-3 rounded-full" style={{ background: "hsl(45, 80%, 50%)" }} />
+            <span
+              className="inline-block w-3 h-3 rounded-full"
+              style={{ background: "hsl(45, 80%, 50%)" }}
+            />
             Medel
           </span>
           <span className="flex items-center gap-1">
-            <span className="inline-block w-3 h-3 rounded-full" style={{ background: "hsl(160, 60%, 40%)" }} />
+            <span
+              className="inline-block w-3 h-3 rounded-full"
+              style={{ background: "hsl(160, 60%, 40%)" }}
+            />
             Hög
           </span>
         </div>
@@ -141,21 +177,17 @@ export default function SchoolMap() {
         activeMetric={activeMetric}
         onSchoolClick={handleSchoolClick}
         selectedSchool={selectedSchool}
+        year={year}
       />
 
-      <MapContainer
-        center={[55.58, 13.05]}
-        zoom={11}
-        className="h-full w-full"
-        zoomControl={false}
-      >
+      <MapContainer center={[55.58, 13.05]} zoom={11} className="h-full w-full" zoomControl={false}>
         <ZoomControl position="topright" />
         <FlyToSchool school={flyTarget} />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         />
-        {schools.map((school) => {
+        {filteredSchools.map((school) => {
           const value = school[activeMetric];
           if (value === null) return null;
           const isSelected = selectedSchool === school.name;
@@ -163,7 +195,9 @@ export default function SchoolMap() {
             <CircleMarker
               key={school.name}
               center={[school.lat, school.lng]}
-              radius={isSelected ? getRadius(value, activeMetric) + 4 : getRadius(value, activeMetric)}
+              radius={
+                isSelected ? getRadius(value, activeMetric) + 4 : getRadius(value, activeMetric)
+              }
               pathOptions={{
                 color: isSelected ? "hsl(220, 90%, 50%)" : getColor(value, activeMetric),
                 fillColor: getColor(value, activeMetric),
