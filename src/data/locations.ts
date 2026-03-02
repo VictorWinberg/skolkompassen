@@ -643,45 +643,8 @@ export const locations: Record<string, { lat: number; lng: number; source: strin
   },
 };
 
-export const locationAliases: Record<string, string> = {
-  ängsdals_skolor_ab: "ängsdals_skola",
-  björkenässkolan: "noblaskolan_löddeköpinge",
-  dalhemsskolan: "anneroskolan",
-  hc_education_i_löddeköpinge: "noblaskolan_löddeköpinge",
-  innovitaskolan_helsingborg: "petersvenskolan",
-  karstorpskolan_södra: "karstorpskolan",
-  kubikskolan: "kubikskolan_dibber",
-  maria_montessori_skolan: "montessori_mondial_malmö",
-  montessorigrundskolan_maria: "montessori_mondial_malmö",
-  nya_stenkulaskolan: "stenkulaskolan",
-  östra_skolan: "östra_skolan_dibber",
-  petersvenskolan_helsingborg: "petersvenskolan",
-  pilbäcksskolan: "pilbäckskolan",
-  rydebäcks_skola: "rydebäcksskolan",
-  rydebäckskolan: "rydebäcksskolan",
-  sveaskolan_limhamn: "sveaskolan",
-  västra_allé: "noblaskolan_mariastaden",
-  vittra_i_västra_hamnen: "vittra_västra_hamnen",
-  vittra_på_landborgen: "vittra_landborgen",
-};
-
-function normalizeName(n: string) {
-  return n
-    .toLowerCase()
-    .replace(/\d+/g, "")
-    .replace(/[\s.,/-]+/g, "_")
-    .replace(/^_+|_+$|_f_$/g, "");
-}
-
-export function getLocation(s: School | string) {
-  const name = typeof s === "string" ? s : s.name;
-  let key = normalizeName(name);
-  if (locationAliases[key]) {
-    key = locationAliases[key];
-  }
-
+export function getLocation(key: string) {
   const location = locations[key];
-
   if (!location) {
     throw new Error(`Location not found for school: ${name}`);
   }

@@ -1,6 +1,7 @@
 import { getLocation } from "./locations";
 
 export interface School {
+  key: string;
   name: string;
   kommun: string;
   principal: string;
@@ -42,9 +43,15 @@ export async function loadSchools(): Promise<void> {
     const percentBoys = parts[8] || "";
     const faktisktVarde1 = toNumberOrNull(parts[9]);
     const faktisktVarde2 = toNumberOrNull(parts[12]);
-    const loc = getLocation(name);
+
+    let key = normalizeName(name);
+    if (schoolAliases[key]) {
+      key = schoolAliases[key];
+    }
+    const loc = getLocation(key);
 
     return {
+      key,
       name,
       kommun,
       principal,
@@ -61,3 +68,33 @@ export async function loadSchools(): Promise<void> {
 
   schools = parsed;
 }
+
+function normalizeName(n: string) {
+  return n
+    .toLowerCase()
+    .replace(/\d+/g, "")
+    .replace(/[\s.,/-]+/g, "_")
+    .replace(/^_+|_+$|_f_$/g, "");
+}
+
+const schoolAliases: Record<string, string> = {
+  ängsdals_skolor_ab: "ängsdals_skola",
+  björkenässkolan: "noblaskolan_löddeköpinge",
+  dalhemsskolan: "anneroskolan",
+  hc_education_i_löddeköpinge: "noblaskolan_löddeköpinge",
+  innovitaskolan_helsingborg: "petersvenskolan",
+  karstorpskolan_södra: "karstorpskolan",
+  kubikskolan: "kubikskolan_dibber",
+  maria_montessori_skolan: "montessori_mondial_malmö",
+  montessorigrundskolan_maria: "montessori_mondial_malmö",
+  nya_stenkulaskolan: "stenkulaskolan",
+  östra_skolan: "östra_skolan_dibber",
+  petersvenskolan_helsingborg: "petersvenskolan",
+  pilbäcksskolan: "pilbäckskolan",
+  rydebäcks_skola: "rydebäcksskolan",
+  rydebäckskolan: "rydebäcksskolan",
+  sveaskolan_limhamn: "sveaskolan",
+  västra_allé: "noblaskolan_mariastaden",
+  vittra_i_västra_hamnen: "vittra_västra_hamnen",
+  vittra_på_landborgen: "vittra_landborgen",
+};

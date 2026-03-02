@@ -1,29 +1,29 @@
+import { useMapFilters } from "@/contexts/MapFilterContext";
+import { School } from "@/data/schools";
+import { getColor, MetricKey, metricLabels } from "@/lib/metrics";
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from "lucide-react";
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from "lucide-react";
-import { schools, School } from "@/data/schools";
-import { MetricKey, metricLabels, getColor } from "@/lib/metrics";
 
 interface SchoolListSidebarProps {
   activeMetric: MetricKey;
   onSchoolClick?: (school: School) => void;
   selectedSchool?: string | null;
-  year?: number;
 }
 
 export default function SchoolListSidebar({
   activeMetric,
   onSchoolClick,
   selectedSchool,
-  year,
 }: SchoolListSidebarProps) {
   const [isOpen, setIsOpen] = useState(true);
   const [expandedSchool, setExpandedSchool] = useState<string | null>(null);
+  const { filteredSchools, deriveMetricValue } = useMapFilters();
 
-  const filtered = typeof year === "number" ? schools.filter((s) => s.år === year) : schools;
+  const filtered = filteredSchools;
 
   const sortedSchools = [...filtered].sort((a, b) => {
-    const aVal = a[activeMetric] ?? 0;
-    const bVal = b[activeMetric] ?? 0;
+    const aVal = deriveMetricValue(a) ?? -Infinity;
+    const bVal = deriveMetricValue(b) ?? -Infinity;
     return bVal - aVal;
   });
 
@@ -54,11 +54,13 @@ export default function SchoolListSidebar({
             <p className="text-[10px] text-muted-foreground">
               Sorterade efter {metricLabels[activeMetric]}
             </p>
+            {/* delta buttons removed per request */}
+            {/* filters are provided by parent */}
           </div>
 
           <div className="flex-1 overflow-y-auto">
             {sortedSchools.map((school, index) => {
-              const value = school[activeMetric];
+              const value = deriveMetricValue(school);
               const isExpanded = expandedSchool === school.name;
 
               return (
@@ -77,7 +79,9 @@ export default function SchoolListSidebar({
                       className="w-2.5 h-2.5 rounded-full shrink-0"
                       style={{
                         background:
-                          value !== null ? getColor(value, activeMetric) : "hsl(var(--muted))",
+                          value !== null && value !== undefined
+                            ? getColor(value, activeMetric)
+                            : "hsl(var(--muted))",
                       }}
                     />
                     <div className="flex-1 min-w-0">
@@ -89,11 +93,15 @@ export default function SchoolListSidebar({
                           </span>
                         </span>
                         <span className="text-xs font-bold text-foreground shrink-0">
-                          {value !== null
+                          {value !== null && value !== undefined
                             ? activeMetric === "faktisktVarde1"
                               ? `${value}%`
-                              : value
-                            : "–"}
+                              : activeMetric === "deltaFaktisktVarde1"
+                                ? `${value > 0 ? "+" : ""}${Math.round(value * 10) / 10} pp`
+                                : activeMetric === "deltaFaktisktVarde2"
+                                  ? `${value > 0 ? "+" : ""}${Math.round(value * 10) / 10} pts`
+                                  : value
+                            : "-"}
                         </span>
                       </div>
                     </div>
@@ -109,17 +117,18 @@ export default function SchoolListSidebar({
                       <div className="grid grid-cols-2 gap-1.5">
                         <div className="bg-muted/60 rounded p-1.5 text-center">
                           <div className="text-sm font-bold text-foreground">
-                            {school.faktisktVarde1 ?? "–"}%
+                            {school.faktisktVarde1 ?? "-"}%
                           </div>
                           <div className="text-[9px] text-muted-foreground">Behörighet</div>
                         </div>
                         <div className="bg-muted/60 rounded p-1.5 text-center">
                           <div className="text-sm font-bold text-foreground">
-                            {school.faktisktVarde2 ?? "–"}
+                            {school.faktisktVarde2 ?? "-"}
                           </div>
                           <div className="text-[9px] text-muted-foreground">Meritvärde</div>
                         </div>
                       </div>
+
                       <div className="text-[10px] text-muted-foreground space-y-0.5">
                         <div>Kommun: {school.kommun}</div>
                         <div>Huvudman: {school.principal === "Kom." ? "Kommunal" : "Enskild"}</div>
