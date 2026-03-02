@@ -52,9 +52,9 @@ export const locations: Record<string, { lat: number; lng: number; source: strin
     source: "Ebba Ströms g 22A, 212 50 Malmö, Sweden",
   },
   baldersskolan: {
-    lat: 59.4125172,
-    lng: 18.0116456,
-    source: "Baldersvägen 18, 182 35 Danderyd, Sweden",
+    lat: 55.6445629,
+    lng: 13.2122004,
+    source: "Mimers väg 2, 245 32 Staffanstorp, Sweden",
   },
   barsebäcks_montessoriskola: {
     lat: 55.770029,
@@ -62,9 +62,9 @@ export const locations: Record<string, { lat: number; lng: number; source: strin
     source: "Löddevägen 2, 246 57 Barsebäck, Sweden",
   },
   bergaskolan: {
-    lat: 59.85015439999999,
-    lng: 17.6191131,
-    source: "Norbyvägen 25, 752 39 Uppsala, Sweden",
+    lat: 55.5777197,
+    lng: 12.9375738,
+    source: "Hyllie kyrkoväg 63, 216 16 Limhamn, Sweden",
   },
   bjärehovskolan: {
     lat: 55.72054439999999,
@@ -117,9 +117,9 @@ export const locations: Record<string, { lat: number; lng: number; source: strin
     source: "Svenshögsvägen 25A, 226 42 Lund, Sweden",
   },
   framtidskomp_v_ingelstad_sk: {
-    lat: 56.7452808,
-    lng: 14.9206182,
-    source: "355 71 Ingelstad, Sweden",
+    lat: 55.4948415,
+    lng: 13.1111872,
+    source: "Landsvägen 374, 235 41 Vellinge, Sweden",
   },
   framtidskompassen_i_vellinge: {
     lat: 55.4713597,
@@ -612,9 +612,9 @@ export const locations: Record<string, { lat: number; lng: number; source: strin
     source: "Videdalsskolan, Hohögsgatan 65, 212 31 Malmö, Sweden",
   },
   vikingaskolan: {
-    lat: 59.1635193,
-    lng: 18.1482604,
-    source: "Sleipnervägen 2, 136 42 Handen, Sweden",
+    lat: 55.6975707,
+    lng: 13.2398277,
+    source: "Egils gränd 16, 224 75 Lund, Sweden",
   },
   vittra_adolfsberg: {
     lat: 56.0457833,
