@@ -32,7 +32,7 @@ export async function loadSchools(): Promise<void> {
     .slice(1)
     .map((line) => line.split(";").map((p) => p.replace(/^"|"$/g, "").trim()));
 
-  const parsed: School[] = rows.map((parts) => {
+  const parsed: School[] = rows.map((parts, i) => {
     const år = toNumberOrNull(parts[0]);
     const kommun = parts[1] || "";
     const name = parts[2] || "";
@@ -42,7 +42,7 @@ export async function loadSchools(): Promise<void> {
     const percentBoys = parts[8] || "";
     const faktisktVarde1 = toNumberOrNull(parts[9]);
     const faktisktVarde2 = toNumberOrNull(parts[12]);
-    const loc = getLocation(name) || { lat: 0, lng: 0 };
+    const loc = getLocation(name);
 
     return {
       name,
