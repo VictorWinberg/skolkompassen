@@ -1,40 +1,13 @@
 import { MapContainer, TileLayer, CircleMarker, Popup, ZoomControl, useMap } from "react-leaflet";
 import { schools, School } from "@/data/schools";
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import SchoolListSidebar from "./SchoolListSidebar";
-import L from "leaflet";
-
-type MetricKey = "faktisktVarde1" | "faktisktVarde2";
-
-const metricLabels: Record<MetricKey, string> = {
-  faktisktVarde1: "Behörighet (%)",
-  faktisktVarde2: "Meritvärde (poäng)",
-};
-
-function getColor(value: number, metric: MetricKey): string {
-  const ranges: Record<MetricKey, [number, number]> = {
-    faktisktVarde1: [30, 100],
-    faktisktVarde2: [180, 300],
-  };
-  const [min, max] = ranges[metric];
-  const ratio = Math.max(0, Math.min(1, (value - min) / (max - min)));
-  if (ratio > 0.66) return "hsl(160, 60%, 40%)";
-  if (ratio > 0.33) return "hsl(45, 80%, 50%)";
-  return "hsl(0, 70%, 50%)";
-}
-
-function getRadius(value: number, metric: MetricKey): number {
-  const ranges: Record<MetricKey, [number, number]> = {
-    faktisktVarde1: [30, 100],
-    faktisktVarde2: [180, 300],
-  };
-  const [min, max] = ranges[metric];
-  const ratio = Math.max(0, Math.min(1, (value - min) / (max - min)));
-  return 6 + ratio * 10;
-}
+import { MetricKey, metricLabels, getColor, getRadius } from "@/lib/metrics";
 
 function PopupContent({ school }: { school: School }) {
-  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(school.name + " " + school.kommun)}`;
+  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    school.name + " " + school.kommun,
+  )}`;
   return (
     <div className="p-3 space-y-2">
       <h3 className="font-bold text-sm text-foreground leading-tight">{school.name}</h3>
@@ -153,6 +126,13 @@ export default function SchoolMap() {
               className="inline-block w-3 h-3 rounded-full"
               style={{ background: "hsl(0, 70%, 50%)" }}
             />
+            Mycket låg
+          </span>
+          <span className="flex items-center gap-1">
+            <span
+              className="inline-block w-3 h-3 rounded-full"
+              style={{ background: "hsl(28, 85%, 50%)" }}
+            />
             Låg
           </span>
           <span className="flex items-center gap-1">
@@ -168,6 +148,13 @@ export default function SchoolMap() {
               style={{ background: "hsl(160, 60%, 40%)" }}
             />
             Hög
+          </span>
+          <span className="flex items-center gap-1">
+            <span
+              className="inline-block w-3 h-3 rounded-full"
+              style={{ background: "hsl(210, 60%, 45%)" }}
+            />
+            Mycket hög
           </span>
         </div>
       </div>
@@ -199,7 +186,7 @@ export default function SchoolMap() {
                 isSelected ? getRadius(value, activeMetric) + 4 : getRadius(value, activeMetric)
               }
               pathOptions={{
-                color: isSelected ? "hsl(220, 90%, 50%)" : getColor(value, activeMetric),
+                color: isSelected ? "hsl(210, 60%, 45%)" : getColor(value, activeMetric),
                 fillColor: getColor(value, activeMetric),
                 fillOpacity: isSelected ? 0.9 : 0.7,
                 weight: isSelected ? 4 : 2,

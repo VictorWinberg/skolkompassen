@@ -1,29 +1,13 @@
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp, MapPin } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from "lucide-react";
 import { schools, School } from "@/data/schools";
+import { MetricKey, metricLabels, getColor } from "@/lib/metrics";
 
 interface SchoolListSidebarProps {
-  activeMetric: "faktisktVarde1" | "faktisktVarde2";
+  activeMetric: MetricKey;
   onSchoolClick?: (school: School) => void;
   selectedSchool?: string | null;
   year?: number;
-}
-
-const metricLabels = {
-  faktisktVarde1: "Behörighet",
-  faktisktVarde2: "Meritvärde",
-};
-
-function getColor(value: number, metric: "faktisktVarde1" | "faktisktVarde2"): string {
-  const ranges = {
-    faktisktVarde1: [30, 100] as [number, number],
-    faktisktVarde2: [180, 300] as [number, number],
-  };
-  const [min, max] = ranges[metric];
-  const ratio = Math.max(0, Math.min(1, (value - min) / (max - min)));
-  if (ratio > 0.66) return "hsl(160, 60%, 40%)";
-  if (ratio > 0.33) return "hsl(45, 80%, 50%)";
-  return "hsl(0, 70%, 50%)";
 }
 
 export default function SchoolListSidebar({
