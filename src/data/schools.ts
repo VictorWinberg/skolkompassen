@@ -24,7 +24,7 @@ function toNumberOrNull(s: string | undefined): number | null {
 export let schools: School[] = [];
 
 export async function loadSchools(): Promise<void> {
-  const res = await fetch("/data/salsa.csv");
+  const res = await fetch(`${import.meta.env.BASE_URL}data/salsa.csv`);
   if (!res.ok) throw new Error("Failed to fetch CSV");
   const text = await res.text();
 
